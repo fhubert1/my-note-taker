@@ -1,1 +1,1 @@
-# my-note-taker
+# My Note Taker Project
