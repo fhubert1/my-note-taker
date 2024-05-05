@@ -1,34 +1,48 @@
-const notes = require('../routes/notes');
+const app = require('../routes/notes');
 const { readFromFile, readAndAppend, writeToFile } = require('../helpers/fsUtils');
 
-// Mock dependencies
-jest.mock('../helpers/fsUtils');
-
 // Mock Express request and response objects
-const { mockReq, mockRes } = require('jest-express');
+const request = require('supertest');
+jest.mock('../helpers/fsUtils'); // Mock the fsUtils module
 
 describe('Notes Router', () => {
-    beforeEach(() => {
-      // Clear any mock calls before each test
-      jest.clearAllMocks();
+  it('responds with JSON containing notes data', (done) => {
+    // Mock the behavior of readFromFile
+    readFromFile.mockResolvedValue(JSON.stringify([{ id: '1', title: 'Note 1', text: 'Content of Note 1' }]));
+
+    request(app)
+      .get('/api/notes')
+      .expect('Content-Type', /json/)
+      .expect(200, done)
+      .end((err, res) => {
+        if (err) return done(err);
+      
+        // Add your assertions here to check the response body
+        const notes = res.json();
+        console.log(notes);
+        expect(notes.length).toBeGreaterThan(0);
+        expect(notes[0]).toHaveProperty('id');
+        expect(notes[0]).toHaveProperty('title');
+        expect(notes[0]).toHaveProperty('text');
+        done();
     });
+  });
 
-    test('GET / returns all notes', async () => {
 
-
-      //const req = mockReq({method: 'GET', url: '/'});
-      const req = mockReq();
-      const res = mockRes();
-    
-      const mockData = [{ id: '1', title: 'Test Title', text: 'Test text' }];
-      readFromFile.mockResolvedValue(JSON.stringify(mockData));
-        
-      //await notes(req, res);
-      await notes.get('/', req, res);
-
-    
-      expect(res.json).toHaveBeenCalledWith(mockNotesData);
-    });   
-              
-
+  // it('responds with JSON containing a specific note', (done) => {
+  //   const noteId = '1'; // Provide a valid note ID from your test data
+  //   request(notes)
+  //     .get(`/${noteId}`)
+  //     .expect('Content-Type', /json/)
+  //     .expect(200, done);
+  //     // .end((err, res) => {
+  //     //   if (err) return done(err);
+  //     //   // Add your assertions here to check the response body
+  //     //   // For example:
+  //     //   const note = res.json();
+  //     //   expect(note.id).toBe(noteId);
+  //     //   // Add more assertions as needed based on your response structure
+  //     //   done();
+  //     });
+  // });  
 });    
