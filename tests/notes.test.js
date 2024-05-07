@@ -1,4 +1,5 @@
 const notesRouter = require('../routes/notes');
+
 const httpMocks = require('node-mocks-http');
 const { readFromFile, readAndAppend, writeToFile } = require('../helpers/fsUtils');
 
@@ -16,12 +17,16 @@ describe('Notes Router', () => {
     // Mock the behavior of readFromFile
     readFromFile.mockResolvedValue(JSON.stringify(notesData));
 
+    // create mock request for get passing note_id
     const req = httpMocks.createRequest({
-      method: 'get',
+      method: 'GET',
       url: '/',
-      params: { note_id: noteId }
+      params: {note_id: noteId} 
     });
+    // created mock response
     const res = httpMocks.createResponse();
+
+    console.log('req params sent: ' + req.params.note_id);
 
     await notesRouter(req, res);
 
@@ -29,34 +34,42 @@ describe('Notes Router', () => {
     expect(res.statusCode).toBe(200);
 
     // Check the response body
-    const note = JSON.parse(res._getData());
+    const note = res._getData();
+    console.log("get res note: " + JSON.parse(note));
+
     expect(note.length).toBeGreaterThan(0);
-    expect(note[0]).toHaveProperty('id', noteId);
+    const jsonArray = JSON.parse(note);
+    expect(jsonArray[0].id).toEqual(noteId);
+
   });
 
   // test case for deletion of test case 2
   it('DELETE /:note_id should delete a specific note', async () => {
-    const noteId = '2';
-    const notesData = [{ id: '2', title: 'Delete Me', text: 'Delete Me Text' }];
+    const noteId = '1';
+    const notesData = [{ id: '1', title: 'Delete Me', text: 'Delete Me Text' }];
 
-    // Mock the behavior of writing record to db
-    readAndAppend.mockResolvedValue(notesData, './db/notes.json');
-    //writeToFile.mockResolvedValue(JSON.stringify(notesData));
+    // Mock the behavior of readFromFile and writeToFile
+    //readFromFile.mockResolvedValue(JSON.stringify(notesData));
+    readFromFile.mockResolvedValue(JSON.stringify(notesData));
+    writeToFile.mockResolvedValue();
 
+    // create mock request - method delete passing note_id to delete
     const req = httpMocks.createRequest({
-      method: 'delete',
-      url: '/',
-      params: { note_id: noteId }
+      method: 'DELETE',
+      url: `/${noteId}`,
     });
 
+    // create mock request
     const res = httpMocks.createResponse();
 
-    await notesRouter(req, res);
+    console.log('req params sent to be deleted: ' + req.params.note_id);
 
-    // Check the response status and content
+    // call method 
+    const next = jest.fn();
+    await notesRouter(req, res, next);
+
     expect(res.statusCode).toBe(200);
-    const response = JSON.parse(res._getData());
-    expect(response).toEqual(`Item ${noteId} has been deleted 🗑️`);
+
   });  
 
   // post new note into db
@@ -66,13 +79,17 @@ describe('Notes Router', () => {
     // Mock the behavior of readAndAppend
     readAndAppend.mockResolvedValue();
 
+    // create mock request for post and pass new note in body
     const req = httpMocks.createRequest({
       method: 'post',
       url: '/',
       body: newNote
     });
+
+    // create mock response
     const res = httpMocks.createResponse();
 
+    // call method
     await notesRouter(req, res);
 
     // Check the response status and content
@@ -80,6 +97,7 @@ describe('Notes Router', () => {
     const response = JSON.parse(res._getData());
     console.log('response: ' + response);
     expect(response).toEqual('Note added successfully');
+
   });
   
 

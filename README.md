@@ -1,7 +1,7 @@
 # My Note Taker Project
 
 ## Description
-Build the backend and connect it to the established front end to complet the Note Taker Application.  Once completed the application can be used to write and save notes.  Application uses Express.js and will save and retrieve notes from a JSON file stored on the file system.
+Build the backend and connect it to the established front end to complet the Note Taker Application.  Once completed the application can be used to write and save notes.  Application uses Express.js and will save and retrieve notes from a JSON file stored on the file system.  The application will be deployed to Render.
 
 [repo](https://github.com/fhubert1/my-note-taker)
 
@@ -34,9 +34,15 @@ WHEN I click on the "New Note" button in the navigation at the top of the page
 THEN I am presented with empty fields to enter a new note title and the note’s text in the right-hand column and the button disappears
 
 ## Screenshots
+[Home Page](./public/assets/images/Screenshot_index.jpg)
+
+[Notes Page](./public/assets/images/Screenshot_notes.gif)
 
 
 ## Deployment
+[Note Taker App](https://my-note-taker-1.onrender.com/)
 
 
 ## Notes
+
+Attened multiple office hours to get assistance with building test cases

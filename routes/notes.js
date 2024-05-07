@@ -10,7 +10,9 @@ notes.get('/', (req, res) => {
 
 // GET Route for a specific note
 notes.get('/:note_id', (req, res) => {
+  console.log("calling get");
     const noteId = req.params.note_id;
+
     readFromFile('./db/notes.json')
       .then((data) => JSON.parse(data))
       .then((json) => {
@@ -23,11 +25,13 @@ notes.get('/:note_id', (req, res) => {
 
 // DELETE Route for a specific note
 notes.delete('/:note_id', (req, res) => {
+  console.log("calling delete");
     const noteId = req.params.note_id;
     readFromFile('./db/notes.json')
       .then((data) => JSON.parse(data))
       .then((json) => {
         // Make a new array of all tips except the one with the ID provided in the URL
+        console.log("filter id is: " + json);
         const result = json.filter((note) => note.id !== noteId);
   
         // Save that array to the filesystem
@@ -40,10 +44,11 @@ notes.delete('/:note_id', (req, res) => {
 
 // POST Route for a new UX/UI tip
 notes.post('/', (req, res) => {
+
     console.log(req.body);
   
     const { title, text } = req.body;
-  
+    // if body passed create new note
     if (req.body) {
       const newNote = {
         id: uuidv4(),
@@ -51,6 +56,7 @@ notes.post('/', (req, res) => {
         text,
       };
   
+      // 
       readAndAppend(newNote, './db/notes.json');
       res.json(`Note added successfully`);
     } else {
